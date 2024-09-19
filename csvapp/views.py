@@ -12,7 +12,7 @@ class CSVUploadView(APIView):
         if serializer.is_valid():
             csv_file = serializer.save()
             return Response({"message": "File uploaded successfully", "file_id": str(csv_file.id)}, status=status.HTTP_201_CREATED)
-        return Response({"error": "Invalid file format"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid file formatformat. Only CSV files are allowed"}, status=status.HTTP_400_BAD_REQUEST)
 
 class CSVOperationView(APIView):
     def post(self, request):
@@ -30,7 +30,7 @@ class CSVOperationView(APIView):
             return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
 
         if operation not in ["dedup", "unique","filter"]:
-            return Response({"error": "Invalid operation"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid operation or file not found."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Start the task using Celery
         task = process_csv_task.delay(csv_file.file.path, operation, column, filters)
